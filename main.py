@@ -1,3 +1,5 @@
+#This code is machine specific but it is an excersize in my own understanding on Convolutional Neural Networks. The only thing that currently is not implemented is backpropagational weight and bias updates as my understanding of these topics is not yet 100% clear
+
 import skimage
 import sklearn
 from sklearn import datasets
@@ -23,7 +25,7 @@ def findCost(outputVector, y):
         cost = cost * cost
         return cost
 
-def sigmoid(x):  
+def sigmoid(x):
     return numpy.exp(-numpy.logaddexp(0, -x))
 
 X = numpy.zeros((25000, 15, 15)) #Our dataset
@@ -33,7 +35,7 @@ def softmax(x):
     e_x = numpy.exp(x - numpy.max(x))
     return e_x / e_x.sum(axis=0)
 
-def coinToss():
+def coinToss(): #Making binary decisions before learning
     x = random.random()
     if x > 0.5:
         return "H"
@@ -42,13 +44,13 @@ def coinToss():
     else:
         return coinToss()
     
-def ReLU(img):
+def ReLU(img): #implements the ReLU layer (takes image and gets rid of negative values)
     for i in range (0, img.shape[0]):
         for j in range (0, img.shape[1]):
             img[i, j] = numpy.maximum(0, img[i, j])
     return img
 
-def Pool(img):
+def Pool(img): #pool layer with hyperparameter 2, takes regions of image and max-pools them
     poolSize = 2
     posYInImg = 0
     posXInImg = 0
@@ -74,7 +76,7 @@ def Pool(img):
             posYInImg = posYInImg + poolSize
     return pooledImg[0, :, :]
 
-def Convole(img, filterApply, filterDimensions, step):
+def Convole(img, filterApply, filterDimensions, step): #Standard convolutional layer
     #Lets be sure img is grayscale
     img = skimage.color.rgb2gray(img)
     #Get some dimensions to help us set variables
@@ -108,6 +110,7 @@ random.seed()
 countOfCats = 0
 countOfDogs = 0
 
+#settings up  weight matrix and bias vectors randomly
 arrFilter = numpy.zeros((1,3,3))
 arrFilter[0, :, :] = numpy.array([[[0, -1, 0], [-1, 5, -1], [0, -1, 0]]])
 weightMatrix1 = numpy.random.rand(225, 10)
@@ -130,7 +133,7 @@ for biasCount in range(0, 2):
     if coinToss() == "T":
         biasVector2[biasCount] = biasVector2[biasCount] * - 1
     biasVector2[biasCount] = biasVector2[biasCount] * 2
-for i in range(0, 10):
+for i in range(0, 10): #randomise image order, only doing 10 images to save processing time when testing
     if coinToss() == "H" and countOfCats < 12500:
         imagePath = str(r"C:\Users\daniel.deburgo\Downloads\CatsAndDogs\train\cats\cat."+str(int(countOfCats))+".jpg")
         img = io.imread(imagePath) #Open our cat
